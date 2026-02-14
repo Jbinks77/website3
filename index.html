@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celebrating the Art and History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070707;
+      --text-muted: #bdbdbd;
+      --nav-text: rgba(226, 226, 226, 0.78);
+      --nav-text-hover: rgba(245, 245, 245, 0.98);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: #fff;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      position: relative;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.03), transparent 34%),
+        radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.02), transparent 36%),
+        radial-gradient(circle at center, #0b0b0b 0%, #070707 56%, #050505 100%);
+    }
+
+    /* Vignette layer for darker corners and cinematic look. */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -8vmax;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.62) 100%);
+      z-index: 0;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      justify-items: center;
+      align-items: start;
+      padding: 24px 16px 16px;
+      gap: 28px;
+      overflow: hidden;
+    }
+
+    /* Top-centered pill nav with glassmorphism and soft edge/shadow. */
+    .pill-nav {
+      width: min(560px, calc(100vw - 32px));
+      height: 52px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 28px;
+    }
+
+    .pill-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill-nav a {
+      color: var(--nav-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: color 180ms ease;
+      white-space: nowrap;
+    }
+
+    .pill-nav a:hover,
+    .pill-nav a:focus-visible {
+      color: var(--nav-text-hover);
+      outline: none;
+    }
+
+    .center-stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      margin-top: -16px;
+      min-height: 0;
+    }
+
+    /* Spline wrapper keeps a large centered square and adds glow around the ring. */
+    .spline-wrapper {
+      position: relative;
+      width: clamp(320px, 58vmin, 640px);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 0 28px rgba(197, 209, 255, 0.18));
+    }
+
+    .spline-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 13%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(214, 224, 255, 0.2) 0%, rgba(124, 145, 255, 0.08) 32%, rgba(0, 0, 0, 0) 72%);
+      filter: blur(24px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    spline-viewer {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    /* Headline is layered above Spline but won't block ring interaction. */
+    .headline-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      font-size: clamp(1.8rem, 4.6vw, 2.75rem);
+      line-height: 1.12;
+      z-index: 2;
+      pointer-events: none;
+      text-shadow: 0 0 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .headline-overlay span {
+      display: block;
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        padding-top: 18px;
+        gap: 18px;
+      }
+
+      .pill-nav {
+        width: min(520px, calc(100vw - 24px));
+        height: 46px;
+        padding: 0 16px;
+      }
+
+      .pill-nav a {
+        font-size: 0.84rem;
+      }
+
+      .spline-wrapper {
+        width: clamp(280px, 76vmin, 540px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <nav class="pill-nav" aria-label="Primary">
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Product</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+
+    <main class="center-stage" aria-label="Hero section">
+      <div class="spline-wrapper">
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.57/build/spline-viewer.js"></script>
+        <spline-viewer url="https://prod.spline.design/09C4ENrCKPBVoy2M/scene.splinecode"></spline-viewer>
+        <h1 class="headline-overlay" aria-label="Celebrating the Art and History">
+          <span>Celebrating</span>
+          <span>the Art and</span>
+          <span>History</span>
+        </h1>
+      </div>
+    </main>
+  </header>
+</body>
+</html>
