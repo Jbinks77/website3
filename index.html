@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexoria</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg-top: #05060c;
+      --bg-mid: #080a15;
+      --bg-bottom: #101126;
+      --text: #e9ecff;
+      --muted: rgba(214, 222, 247, 0.84);
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      --chip: rgba(255, 255, 255, 0.06);
+      --chip-active: linear-gradient(135deg, rgba(91,129,255,0.9), rgba(147,94,255,0.88));
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    body { background: #070913; }
+
+    /* Background layers */
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      isolation: isolate;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 48%, var(--bg-bottom) 100%);
+    }
+
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(80vmax 60vmax at 18% 88%, rgba(176, 74, 255, 0.24) 0%, rgba(122, 74, 255, 0.12) 28%, rgba(91, 40, 168, 0.06) 42%, transparent 72%),
+        radial-gradient(58vmax 40vmax at 26% 78%, rgba(234, 84, 198, 0.13) 0%, rgba(150, 69, 224, 0.08) 32%, transparent 70%),
+        radial-gradient(34vmax 28vmax at 62% 54%, rgba(75, 117, 255, 0.09) 0%, transparent 76%);
+    }
+
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.35;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255,255,255,0.7) 0 0.7px, transparent 1.2px),
+        radial-gradient(circle at 24% 72%, rgba(255,255,255,0.55) 0 0.8px, transparent 1.3px),
+        radial-gradient(circle at 37% 38%, rgba(210,220,255,0.58) 0 0.7px, transparent 1.3px),
+        radial-gradient(circle at 48% 16%, rgba(255,255,255,0.5) 0 0.65px, transparent 1.25px),
+        radial-gradient(circle at 59% 66%, rgba(220,228,255,0.5) 0 0.75px, transparent 1.3px),
+        radial-gradient(circle at 68% 30%, rgba(255,255,255,0.45) 0 0.65px, transparent 1.2px),
+        radial-gradient(circle at 76% 82%, rgba(212,224,255,0.5) 0 0.75px, transparent 1.25px),
+        radial-gradient(circle at 84% 46%, rgba(255,255,255,0.48) 0 0.7px, transparent 1.2px),
+        radial-gradient(circle at 92% 14%, rgba(226,235,255,0.45) 0 0.65px, transparent 1.15px);
+    }
+
+    .center-glow {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: 34vmax;
+      height: 34vmax;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(108, 159, 255, 0.32) 0%, rgba(95, 120, 255, 0.15) 28%, rgba(72, 86, 190, 0.07) 44%, transparent 72%);
+      filter: blur(8px);
+      animation: pulse 8s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+    }
+
+    /* Arcs SVG */
+    .arcs-wrap {
+      position: absolute;
+      inset: -10% -8% -8% -8%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.78;
+      will-change: transform;
+    }
+
+    .arcs {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Navbar */
+    .nav-wrap {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(760px, calc(100vw - 32px));
+      z-index: 30;
+    }
+
+    .navbar {
+      width: 100%;
+      height: 52px;
+      border-radius: 999px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      gap: 16px;
+    }
+
+    .brand {
+      color: #f1f3ff;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 24px; }
+
+    .nav-links a {
+      color: rgba(225, 230, 255, 0.8);
+      text-decoration: none;
+      font-size: 0.96rem;
+      transition: color .2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: rgba(246, 249, 255, 0.98);
+      outline: none;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      width: min(980px, calc(100vw - 28px));
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      padding-top: 74px;
+      text-align: center;
+    }
+
+    .hero-inner {
+      width: 100%;
+      max-width: 820px;
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 4.2vw, 3.35rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: #f0f3ff;
+      text-wrap: balance;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(1rem, 1.65vw, 1.2rem);
+      line-height: 1.6;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .cta-row {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+    }
+
+    .btn-primary {
+      color: #f3f6ff;
+      background: linear-gradient(135deg, rgba(91,129,255,0.9), rgba(147,94,255,0.88));
+      box-shadow: 0 0 0 1px rgba(180,194,255,0.18) inset, 0 0 24px rgba(117,125,255,0.42);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(199,209,255,0.25) inset, 0 0 34px rgba(126,133,255,0.58);
+      outline: none;
+    }
+
+    .btn-secondary {
+      color: rgba(232, 238, 255, 0.9);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+      color: rgba(250,252,255,0.98);
+      background: rgba(255,255,255,0.09);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .quote-widget {
+      margin-top: 12px;
+      width: min(700px, 100%);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.11);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      text-align: left;
+    }
+
+    .quote-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f4ff;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: var(--chip);
+      color: rgba(230,236,255,0.9);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .chip[aria-pressed="true"] {
+      background: var(--chip-active);
+      border-color: rgba(198,210,255,0.5);
+      color: #f8faff;
+      box-shadow: 0 0 18px rgba(121,125,255,0.35);
+    }
+
+    .field {
+      margin: 12px 0;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: rgba(219,226,246,0.9);
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .field input[type="range"] {
+      width: 100%;
+      accent-color: #7690ff;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(223,230,250,0.9);
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .result-row {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 18px;
+      color: #f3f6ff;
+      font-weight: 600;
+    }
+
+    .result-row span {
+      color: rgba(230,236,255,0.95);
+    }
+
+    .widget-cta {
+      margin-top: 14px;
+      display: inline-flex;
+    }
+
+    .proof {
+      margin-top: 14px;
+      width: min(760px, 100%);
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .metric-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(228,234,255,0.92);
+      font-size: 0.86rem;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .logos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      opacity: 0.28;
+      color: #d7e1ff;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 760px) {
+      .nav-wrap { top: 16px; width: min(620px, calc(100vw - 18px)); }
+      .navbar { height: 46px; padding: 0 14px; }
+      .brand { font-size: 0.93rem; }
+      .nav-links { gap: 14px; }
+      .nav-links a { font-size: 0.83rem; }
+
+      .hero { width: calc(100vw - 18px); padding-top: 56px; }
+      h1 { font-size: clamp(1.6rem, 7vw, 2.25rem); }
+      .subtitle { font-size: 0.95rem; line-height: 1.5; }
+      .quote-widget { padding: 16px; border-radius: 18px; }
+      .result-row { font-size: 0.93rem; }
+      .arcs-wrap { inset: -8% -18% -8% -18%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .center-glow { animation: none; }
+      .btn, .chip { transition: none; }
+      .arcs-wrap { transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layers -->
+  <div class="scene">
+    <div class="center-glow" aria-hidden="true"></div>
+
+    <!-- Arcs SVG -->
+    <div class="arcs-wrap" id="arcsWrap" aria-hidden="true">
+      <svg class="arcs" viewBox="0 0 1600 1000" preserveAspectRatio="none">
+        <defs>
+          <filter id="arcGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="3.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="arcGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#66b1ff" stop-opacity="0.42" />
+            <stop offset="100%" stop-color="#7b61ff" stop-opacity="0.16" />
+          </linearGradient>
+          <linearGradient id="arcGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7e6dff" stop-opacity="0.36" />
+            <stop offset="100%" stop-color="#54a6ff" stop-opacity="0.12" />
+          </linearGradient>
+        </defs>
+        <ellipse cx="880" cy="580" rx="760" ry="380" fill="none" stroke="url(#arcGrad1)" stroke-width="1.4" filter="url(#arcGlow)" />
+        <ellipse cx="720" cy="620" rx="660" ry="320" fill="none" stroke="url(#arcGrad2)" stroke-width="1.2" filter="url(#arcGlow)" />
+        <ellipse cx="1010" cy="520" rx="860" ry="430" fill="none" stroke="url(#arcGrad1)" stroke-width="1" filter="url(#arcGlow)" />
+      </svg>
+    </div>
+
+    <!-- Navbar -->
+    <header class="nav-wrap">
+      <nav class="navbar" aria-label="Navigation principale">
+        <a href="#" class="brand">Nexoria</a>
+        <div class="nav-links">
+          <a href="#">Mes créations</a>
+          <a href="#">Me contacter</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <section class="hero-inner">
+        <h1>Des sites web modernes, rapides et sur-mesure.</h1>
+        <p class="subtitle">Nexoria crée des sites vitrines et landing pages premium, pensés pour convertir.</p>
+
+        <div class="cta-row">
+          <a href="#" class="btn btn-primary">Voir mes créations</a>
+          <a href="#" class="btn btn-secondary">Me contacter</a>
+        </div>
+
+        <section class="quote-widget" aria-label="Estimation instantanée">
+          <h2 class="quote-title">Estimation instantanée</h2>
+
+          <div class="chip-row" role="group" aria-label="Type de projet">
+            <button class="chip" data-type="vitrine" aria-pressed="true" type="button">Site vitrine</button>
+            <button class="chip" data-type="landing" aria-pressed="false" type="button">Landing page</button>
+            <button class="chip" data-type="ecommerce" aria-pressed="false" type="button">E-commerce</button>
+          </div>
+
+          <div class="field">
+            <label for="pagesRange">
+              <span>Nombre de pages</span>
+              <strong id="pagesValue">1</strong>
+            </label>
+            <input id="pagesRange" type="range" min="1" max="12" value="1" />
+          </div>
+
+          <div class="field">
+            <label class="toggle" for="premiumToggle">
+              <input id="premiumToggle" type="checkbox" />
+              <span>Animations premium</span>
+            </label>
+          </div>
+
+          <div class="result-row" aria-live="polite">
+            <div>Estimation: <span id="priceValue">990€</span></div>
+            <div>Délai: <span id="daysValue">10 jours</span></div>
+          </div>
+
+          <div class="widget-cta">
+            <a href="#" class="btn btn-primary">Recevoir mon devis</a>
+          </div>
+        </section>
+
+        <section class="proof" aria-label="Preuves de performance">
+          <div class="metrics">
+            <div class="metric-pill">+30% conversion</div>
+            <div class="metric-pill">Performance 90+</div>
+            <div class="metric-pill">Livraison 7–14 jours</div>
+          </div>
+          <div class="logos" aria-hidden="true">
+            <span>studio nova</span>
+            <span>atelier pulse</span>
+            <span>orion labs</span>
+            <span>pixel forge</span>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const baseByType = {
+        landing: { price: 490, days: 5 },
+        vitrine: { price: 990, days: 10 },
+        ecommerce: { price: 1990, days: 15 }
+      };
+
+      const chips = [...document.querySelectorAll('.chip')];
+      const pagesRange = document.getElementById('pagesRange');
+      const pagesValue = document.getElementById('pagesValue');
+      const premiumToggle = document.getElementById('premiumToggle');
+      const priceValue = document.getElementById('priceValue');
+      const daysValue = document.getElementById('daysValue');
+
+      let selectedType = 'vitrine';
+
+      const updateEstimate = () => {
+        const pages = Number(pagesRange.value);
+        const premium = premiumToggle.checked;
+        const base = baseByType[selectedType];
+        const extraPages = Math.max(0, pages - 1);
+
+        const price = base.price + extraPages * 120 + (premium ? 250 : 0);
+        const days = base.days + extraPages + (premium ? 2 : 0);
+
+        pagesValue.textContent = String(pages);
+        priceValue.textContent = `${price}€`;
+        daysValue.textContent = `${days} jours`;
+      };
+
+      chips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          selectedType = chip.dataset.type;
+          chips.forEach((btn) => btn.setAttribute('aria-pressed', String(btn === chip)));
+          updateEstimate();
+        });
+      });
+
+      pagesRange.addEventListener('input', updateEstimate);
+      premiumToggle.addEventListener('change', updateEstimate);
+      updateEstimate();
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      const arcsWrap = document.getElementById('arcsWrap');
+      let tx = 0;
+      let ty = 0;
+      let cx = 0;
+      let cy = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        const nx = (e.clientX / window.innerWidth) * 2 - 1;
+        const ny = (e.clientY / window.innerHeight) * 2 - 1;
+        tx = nx * 7;
+        ty = ny * 5;
+      }, { passive: true });
+
+      const tick = () => {
+        cx += (tx - cx) * 0.06;
+        cy += (ty - cy) * 0.06;
+        arcsWrap.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+        requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
