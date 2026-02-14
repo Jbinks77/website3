@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hero Landing</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: #e0e0e0;
+    }
+
+    /* Background: deep black base with subtle vignette for darker corners. */
+    body {
+      background:
+        radial-gradient(circle at center, #0b0b0b 0%, #070707 58%, #050505 100%),
+        radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.62) 100%);
+      position: relative;
+    }
+
+    .hero {
+      height: 100vh;
+      width: 100%;
+      position: relative;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      justify-items: center;
+      align-items: start;
+      padding: 22px 16px 16px;
+      gap: 14px;
+      overflow: hidden;
+    }
+
+    /* Navbar: top-centered glass capsule with blur, subtle border, and soft shadow. */
+    .pill-nav {
+      position: relative;
+      z-index: 10;
+      width: min(560px, calc(100vw - 32px));
+      height: 52px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 26px;
+    }
+
+    .pill-nav ul {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+
+    .pill-nav a {
+      color: rgba(225, 225, 225, 0.78);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.18s ease;
+    }
+
+    .pill-nav a:hover,
+    .pill-nav a:focus-visible {
+      color: rgba(245, 245, 245, 0.98);
+      outline: none;
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      margin-top: -10px;
+    }
+
+    /* Spline container sizing: centered square, large on desktop, scales down on mobile. */
+    .spline-container {
+      position: relative;
+      z-index: 1;
+      width: min(640px, 84vmin);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+    }
+
+    spline-viewer {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: transparent;
+      border: 0;
+    }
+
+    @media (max-width: 720px) {
+      .pill-nav {
+        width: min(520px, calc(100vw - 24px));
+        height: 46px;
+        padding: 0 14px;
+      }
+
+      .pill-nav a {
+        font-size: 0.84rem;
+      }
+
+      .spline-container {
+        width: min(540px, 88vmin);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <nav class="pill-nav" aria-label="Primary">
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Product</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="stage" aria-label="Hero Spline showcase">
+      <div class="spline-container">
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.57/build/spline-viewer.js"></script>
+        <spline-viewer url="https://prod.spline.design/qjVdvcPzLZEwqMOp/scene.splinecode"></spline-viewer>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
